@@ -1,6 +1,10 @@
 buildscript {
 	ext {
 		springBootVersion = '1.4.1.RELEASE'
+		springVersion = '5.0.0.M2'
+		rxNettyVersion = '0.5.2-rc.4'
+		logbackVersion = '1.1.7'
+		jacksonVersion = '2.8.2'
 	}
 }
 
@@ -18,12 +22,10 @@ repositories {
 	maven { url "https://repo.spring.io/milestone" }
 }
 
-
 dependencies {
-	compile('org.reactivestreams:reactive-streams:1.0.0')
-	compile('io.projectreactor:reactor-core:3.0.2.RELEASE')
-	compile('io.projectreactor.ipc:reactor-netty:0.5.1.RELEASE')
-	compile('io.projectreactor.ipc:reactor-netty:0.5.1.RELEASE')
-	compile('org.springframework:spring-web-reactive:5.0.0.M2')
-	compile('com.fasterxml.jackson.core:jackson-databind:2.8.2')
+	compile "io.reactivex:rxnetty-common:${rxNettyVersion}"
+	compile "io.reactivex:rxnetty-http:${rxNettyVersion}"
+	compile "org.springframework:spring-web-reactive:${springVersion}"
+	compile "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
+	compile "ch.qos.logback:logback-classic:${logbackVersion}"
 }

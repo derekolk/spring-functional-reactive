@@ -1,15 +1,14 @@
 package com.example;
 
 import org.springframework.http.server.reactive.HttpHandler;
-import org.springframework.http.server.reactive.ReactorHttpHandlerAdapter;
-import org.springframework.web.reactive.function.Response;
+import org.springframework.http.server.reactive.RxNettyHttpHandlerAdapter;
 import org.springframework.web.reactive.function.RouterFunction;
-import reactor.ipc.netty.http.HttpServer;
-import static org.springframework.web.reactive.function.BodyInserters.fromObject;
 
-import java.util.Optional;
+import io.reactivex.netty.protocol.http.server.HttpServer;
+import java.net.InetSocketAddress;
 
-import static org.springframework.web.reactive.function.RouterFunctions.toHttpHandler;
+import static org.springframework.web.reactive.function.RouterFunctions.*;
+import static org.springframework.web.reactive.function.RequestPredicates.*;
 
 public class DemoApplication {
 
@@ -21,20 +20,14 @@ public class DemoApplication {
 
 		HttpHandler httpHandler = toHttpHandler(route);
 
-		ReactorHttpHandlerAdapter adapter = new ReactorHttpHandlerAdapter(httpHandler);
-		HttpServer server = HttpServer.create(HOST, PORT);
-		server.startAndAwait(adapter);
+		// RxNetty
+		RxNettyHttpHandlerAdapter adapter = new RxNettyHttpHandlerAdapter(httpHandler);
+		HttpServer server = HttpServer.newServer(new InetSocketAddress(HOST, PORT));
+		server.start(adapter).awaitShutdown();
 	}
 
 	public static RouterFunction<?> routingFunction() {
-		RouterFunction<String> helloWorldRoute = request -> {
-			if (request.path().equals("/hello-world")) {
-				return Optional.of(r -> Response.ok().body(fromObject("Hello World")));
-			} else {
-				return Optional.empty();
-			}
-		};
-
-		return helloWorldRoute;
+		DemoHandler handler = new DemoHandler();
+		return route(GET("/hello-world"), handler::getDemo).and(route(GET("/wait"), handler::getDemoWait));
 	}
 }
